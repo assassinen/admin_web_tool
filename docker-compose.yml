@@ -3,9 +3,9 @@ version: '2'
 services:
 
   web:
-    build: ./app
+    build: bootstrap
     volumes:
-      - ./app:/var/www
+      - ./bootstrap:/var/www
     ports:
       - "5000:5000"
 

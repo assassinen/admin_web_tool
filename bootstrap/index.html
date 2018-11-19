@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <link href="/bootstrap-3.3.4-dist/css/bootstrap.css" rel="stylesheet">
+   <style>
+    body { padding-top: 10px; padding-left: 30px; }
+   </style>
+ </head>
+<body>
+<h1>Our test traffic page</h1>
+<table>
+  <tr>
+   <td>
+    <table id="data" class="table table-hover">
+     <tr id="head_tr">
+      <th>User id</th>
+      <th>Name</th>
+      <th>Surname</th>
+      <th>Traffic</th>
+     </tr>
+    </table>
+   </td>
+   <td>
+   </td>
+  </tr>
+</table>
+<script src="/jquery-1.11.2.js"></script>
+<script src="/bootstrap-3.3.4-dist/js/bootstrap.js"></script>
+<script>
+var el = $(document);
+console.log("This document:");
+console.log(el);
+var user_id_object = el.find("#userId");
+console.log("UserId object:");
+console.log(user_id_object);
+
+
+var table_head = el.find("#head_tr");
+console.log(table_head);
+
+//Когда по запросу в $.get будет возвращен ответ - выполнить callback функцию которая выведет в консоль этот ответ
+$.when( $.get( "/server/list" )).done( function( data ) {
+ console.log(data);
+ handle_answer(data);
+});
+
+var handle_answer = function (data) {
+ var lines = data.split("\n");
+
+ lines.forEach(function(entry) {
+  if ( entry ) {
+   var entry_jsoned = JSON.parse(entry);
+   element_html = '<tr id="data'+entry_jsoned.user_id+'"><td id="userId">'+entry_jsoned.user_id+'</td><td id="name">'+entry_jsoned.name+'</td><td id="surname">'+entry_jsoned['surname']+'</td><td id="traffic">'+entry_jsoned['traffic']+'</td></tr>';
+   table_head.after(element_html);
+   console.log(element_html);
+  }
+ });
+
+};
+
+</script>
+</body>
+</html>
