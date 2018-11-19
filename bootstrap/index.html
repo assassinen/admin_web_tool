@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
  <head>
-   <link href="/bootstrap-3.3.4-dist/css/bootstrap.css" rel="stylesheet">
+   <link href="/css/bootstrap.css" rel="stylesheet">
    <style>
     body { padding-top: 10px; padding-left: 30px; }
+    .trafficform  { padding-left: 10px; }
    </style>
  </head>
 <body>
-<h1>Our test traffic page</h1>
+<p><h1>Our test traffic page</h1></p>
+<form id="traffic_info" class="form-inline">
+<div class="form-group trafficform">
+ <label for="Name">Id</label>
+  <input type="text" class="form-control" id="id" placeholder="">
+</div>
+<div class="form-group trafficform">
+ <label for="Name">Name</label>
+  <input type="text" class="form-control" id="name" placeholder="Jane">
+</div>
+<div class="form-group trafficform">
+ <label for="Surname">Surname</label>
+  <input type="text" class="form-control" id="surname" placeholder="Doe">
+</div>
+<div class="form-group trafficform">
+ <label for="Traffic">Traffic</label>
+ <input type="text" class="form-control input-mir" id="traffic" placeholder="">
+</div>
+<a id="button_submit" class="btn btn-success">
+   <i class="icon-trash icon-white"></i>
+    Push
+</a>
+</form>
+<br/>
 <table>
   <tr>
    <td>
@@ -25,7 +49,7 @@
   </tr>
 </table>
 <script src="/jquery-1.11.2.js"></script>
-<script src="/bootstrap-3.3.4-dist/js/bootstrap.js"></script>
+<script src="/js/bootstrap.js"></script>
 <script>
 var el = $(document);
 console.log("This document:");
@@ -34,29 +58,78 @@ var user_id_object = el.find("#userId");
 console.log("UserId object:");
 console.log(user_id_object);
 
-
 var table_head = el.find("#head_tr");
 console.log(table_head);
 
-//Когда по запросу в $.get будет возвращен ответ - выполнить callback функцию которая выведет в консоль этот ответ
-$.when( $.get( "/server/list" )).done( function( data ) {
- console.log(data);
- handle_answer(data);
-});
+var traffic_info = el.find("#traffic_info");
+console.log(traffic_info);
+
+// Получаем селекторы на наши поля, где мы будем забивать данные
+var traffic_info_id = traffic_info.find("#id")
+var traffic_info_name = traffic_info.find("#name")
+var traffic_info_surname = traffic_info.find("#surname")
+var traffic_info_traffic = traffic_info.find("#traffic")
+var traffic_info_button = traffic_info.find("#button_submit")
+
+// Весь действия отрисовывающие записи на страничке мы перенесли в отдельную функцию, чтобы потом иметь возможность
+// вызывать её из любого места кода.
+var add_table_records = function () {
+ //Когда по запросу в $.get будет возвращен ответ выполнить callback-функцию, которая выведет в консоль этот ответ и далее передаст
+ //его функции nadle_answer, которая уже отрисует его на страничке
+ $.when( $.get( "/server/list" )).done( function( data ) {
+  console.log("Recevied data from /server/list api:");
+  console.log(data);
+  handle_answer(data);
+ });
+}
 
 var handle_answer = function (data) {
+ // Разбиваем полученные данные по \n - переносу строки и превращаем в список
  var lines = data.split("\n");
 
+ // Перебираем каждый элемент списка
  lines.forEach(function(entry) {
   if ( entry ) {
+   // Парсим в json текущий элемент
    var entry_jsoned = JSON.parse(entry);
+  // Генерим html для tr-элемента
    element_html = '<tr id="data'+entry_jsoned.user_id+'"><td id="userId">'+entry_jsoned.user_id+'</td><td id="name">'+entry_jsoned.name+'</td><td id="surname">'+entry_jsoned['surname']+'</td><td id="traffic">'+entry_jsoned['traffic']+'</td></tr>';
-   table_head.after(element_html);
+
+   console.log("Generated html is:");
    console.log(element_html);
+
+   // Вставляем html после селектора table_head
+   table_head.after(element_html);
   }
  });
 
 };
+
+var handle_click = function(event) {
+ console.log("Button pressed. Data recevied is:");
+ console.log(event.data)
+
+ // Формируем Url для нашей ручки add в соответствии с данными, полученными по селекторам в форме. В event.data - находится та информация которую мы передавали по
+ // нажатию кнопки
+ var url = '/server/add?user_id='+event.data.id.val()+'&name='+event.data.name.val()+'&surname='+event.data.surname.val()+'&traffic='+event.data.traffic.val()
+
+ console.log("Url for user add");
+ console.log(url);
+
+ //Когда по запросу в $.get будет возвращен ответ выполнить callback – функцию которая обновит таблицу со свежеполученными данными
+ $.when( $.get( url )).done( function( data ) {
+
+  console.log("Get all elements except head and remove then:");
+  console.log(table_head.nextAll('tr'));
+  table_head.nextAll('tr').remove();
+  add_table_records();
+  });
+};
+
+// Если нажата кнопка, вызываем функцию handle_click и передаем ей набор селекторов в json-объекте откуда можно взять данные
+traffic_info_button.on('click', { id : traffic_info_id, name : traffic_info_name, surname: traffic_info_surname, traffic: traffic_info_traffic }, handle_click);
+//Здесь мы и
+add_table_records();
 
 </script>
 </body>
