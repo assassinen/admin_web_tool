@@ -5,6 +5,7 @@
 **/.idea/**
 .idea/*
 .idea
+*idea*
 */common
 # CMake
 cmake-build-debug/
