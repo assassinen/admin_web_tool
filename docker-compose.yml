@@ -2,10 +2,30 @@ version: '2'
 
 services:
 
-  web:
-    build: bootstrap
+#  web:
+#    build: bootstrap
+#    volumes:
+#      - ./bootstrap:/var/www
+#    ports:
+#      - "5000:5000"
+
+  auth:
+    build:
+      context: auth
+      dockerfile: Dockerfile
+    hostname: auth
     volumes:
-      - ./bootstrap:/var/www
+      - ./auth:/app/flask-jwt
     ports:
       - "5000:5000"
 
+
+  web:
+    build:
+      context: django_app
+      dockerfile: Dockerfile
+    hostname: django_app
+    volumes:
+      - ./django_app:/usr/src/app
+    ports:
+      - "8080:8000"

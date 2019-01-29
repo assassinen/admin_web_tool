@@ -1,0 +1,8 @@
+{"user_id": "2", "name": "docker"}
+{"user_id": "1", "name": "docker"}
+{"user_id": "3", "name": "python"}
+{"user_id": "4", "name": "flask"}
+{"user_id": "4", "name": "flask"}
+{"user_id": "5", "name": "5", "surname": "", "traffic": ""}
+{"user_id": "6", "name": "\u0442\u0435\u0441\u0442", "surname": "", "traffic": ""}
+{"user_id": "7", "name": "test", "surname": "", "traffic": ""}
